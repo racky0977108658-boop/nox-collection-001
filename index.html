@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>墮落與飛升 — NOX Collection No.001</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; background: #0a0a0a; }
+  body { font-family: 'Helvetica Neue', -apple-system, 'PingFang TC', 'Noto Sans TC', sans-serif; }
+  #stage { position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 50% 30%, #15151c 0%, #0a0a0a 65%); }
+  canvas { display: block; }
+  .label { position: fixed; left: 34px; bottom: 38px; z-index: 10;
+    opacity: 0; animation: rise 1s ease 1s forwards; }
+  .label .eyebrow { font-size: 10px; letter-spacing: 0.34em; color: #D4AF37; }
+  .label h1 { margin: 10px 0 6px; font-size: 28px; font-weight: 600;
+    color: #f0ead8; letter-spacing: 0.02em; }
+  .label p { font-size: 12px; color: #8a8a8a; line-height: 1.7; }
+  #loader { position: fixed; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 16px; z-index: 20;
+    background: #0a0a0a; transition: opacity 1.2s ease; }
+  #loader.done { opacity: 0; pointer-events: none; }
+  .ring { width: 34px; height: 34px; border-radius: 50%;
+    border: 2px solid rgba(212,175,55,0.22); border-top-color: #D4AF37;
+    animation: spin 0.8s linear infinite; }
+  #pct { color: #8a7a4a; font-size: 11px; letter-spacing: 0.28em; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes rise { from { opacity:0; transform:translateY(14px); }
+    to { opacity:1; transform:translateY(0); } }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.01s !important; } }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="loader"><span class="ring"></span><span id="pct">LOADING 0%</span></div>
+<div class="label">
+  <div class="eyebrow">NOX COLLECTION · No. 001</div>
+  <h1>墮落與飛升</h1>
+  <p>AI 生成雕塑 · Tripo3D / 2026<br>移動游標環視作品 — 靜止後雕像將自行緩慢旋轉</p>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0x0a0a0a, 9, 17);
+const camera = new THREE.PerspectiveCamera(40, innerWidth/innerHeight, 0.1, 50);
+camera.position.set(0, 0.6, 6.4);
+
+scene.add(new THREE.AmbientLight(0x303040, 1.2));
+const key = new THREE.SpotLight(0xfff2dd, 90, 40, Math.PI/5, 0.45, 1.6);
+key.position.set(0, 8, 4); scene.add(key);
+const rim = new THREE.PointLight(0xd4af37, 28, 22, 1.8);
+rim.position.set(4, 2, -3.5); scene.add(rim);
+const fill = new THREE.PointLight(0x6878b8, 9, 24, 1.8);
+fill.position.set(-4, 0.5, 3); scene.add(fill);
+
+/* pedestal */
+const pedestal = new THREE.Group();
+pedestal.add(new THREE.Mesh(
+  new THREE.CylinderGeometry(2.0, 2.15, 0.18, 64),
+  new THREE.MeshStandardMaterial({ color: 0x101010, metalness: 0.4, roughness: 0.35 })));
+const ring = new THREE.Mesh(
+  new THREE.TorusGeometry(2.02, 0.012, 12, 96),
+  new THREE.MeshBasicMaterial({ color: 0xd4af37 }));
+ring.rotation.x = Math.PI/2; ring.position.y = 0.09;
+pedestal.add(ring);
+pedestal.position.y = -1.75;
+scene.add(pedestal);
+
+/* dust */
+const dustGeo = new THREE.BufferGeometry();
+const dustPos = new Float32Array(300*3);
+for (let i=0;i<300;i++){ dustPos[i*3]=(Math.random()-0.5)*10;
+  dustPos[i*3+1]=Math.random()*6-2; dustPos[i*3+2]=(Math.random()-0.5)*8; }
+dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos,3));
+const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({
+  color: 0xd4af37, size: 0.018, transparent: true, opacity: 0.45 }));
+scene.add(dust);
+
+/* statue */
+const pivot = new THREE.Group(); scene.add(pivot);
+const loader = document.getElementById('loader');
+const pct = document.getElementById('pct');
+new GLTFLoader().load('statue.glb',
+  (gltf) => {
+    const wrapper = new THREE.Group();
+    wrapper.add(gltf.scene);
+    wrapper.scale.setScalar(3.1);
+    wrapper.position.y = -0.1;
+    pivot.add(wrapper);
+    loader.classList.add('done');
+  },
+  (e) => { if (e.total) pct.textContent = 'LOADING ' + Math.round(e.loaded/e.total*100) + '%'; },
+  (err) => { pct.textContent = 'LOAD FAILED'; console.error(err); }
+);
+
+/* interaction */
+const target = { x: 0, y: 0 };
+let lastMove = 0, idleAngle = 0;
+const onPointer = (e) => {
+  const pt = e.touches ? e.touches[0] : e;
+  target.x = (pt.clientX/innerWidth)*2-1;
+  target.y = -((pt.clientY/innerHeight)*2-1);
+  lastMove = performance.now();
+};
+addEventListener('pointermove', onPointer, { passive: true });
+addEventListener('touchmove', onPointer, { passive: true });
+addEventListener('resize', () => {
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const t = clock.elapsedTime;
+  if (performance.now() - lastMove > 2000 && !reduced) idleAngle += dt*0.25;
+  const ry = idleAngle + target.x*0.85, rx = -target.y*0.18;
+  pivot.rotation.y += (ry - pivot.rotation.y)*0.06;
+  pivot.rotation.x += (rx - pivot.rotation.x)*0.06;
+  if (!reduced) {
+    pivot.position.y = Math.sin(t*0.7)*0.05;
+    rim.intensity = 28 + Math.sin(t*1.5)*5;
+    dust.rotation.y = t*0.02;
+  }
+  camera.position.x += (target.x*0.35 - camera.position.x)*0.03;
+  camera.position.y += (0.6 + target.y*0.2 - camera.position.y)*0.03;
+  camera.lookAt(0, 0.2, 0);
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
