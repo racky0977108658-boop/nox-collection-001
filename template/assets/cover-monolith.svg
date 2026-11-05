@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500" role="img" aria-label="">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="28%" r="75%">
+      <stop offset="0%" stop-color="#1a2820"/>
+      <stop offset="100%" stop-color="#050b07"/>
+    </radialGradient>
+    <linearGradient id="stone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4efe6"/>
+      <stop offset="42%" stop-color="#c9a96a"/>
+      <stop offset="100%" stop-color="#2a2418"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <ellipse cx="400" cy="392" rx="168" ry="16" fill="none" stroke="#e0c57a" stroke-width="1.5" opacity="0.9"/>
+  <path d="M400 78c58 72 78 132 58 196-16 52-34 92-58 128-24-36-42-76-58-128-20-64 0-124 58-196z" fill="url(#stone)"/>
+</svg>

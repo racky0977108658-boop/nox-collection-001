@@ -11,6 +11,16 @@
 | 共用技術與 Skill | [NOX 技術庫](https://github.com/racky0977108658-boop/nox-assets) |
 | 倉庫分類總覽 | [GitHub 結構檢查](https://github.com/racky0977108658-boop/nox-assets/blob/main/docs/audits/GITHUB-REPOSITORY-AUDIT-2026-10-02.md) |
 
+## 作品集模板
+
+可轉售的互動 3D 作品集在 [template/](template/)。客戶只改 `template/config.js`。說明見 [template/README.md](template/README.md)。
+
+GitHub Pages 展示路徑（本倉庫已從 `main` 根目錄發布，合併後）：
+
+https://racky0977108658-boop.github.io/nox-collection-001/template/
+
+本目錄的 `index.html` 仍是雕塑展廳案例，不是模板。
+
 ## 主要檔案
 
 | 路徑 | 用途 |
